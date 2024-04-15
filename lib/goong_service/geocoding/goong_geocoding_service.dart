@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
-import '../../google_api_service/utils/helper_utils.dart';
 import '../goong_service.dart';
 import '../places/goong_place_result.dart';
 
