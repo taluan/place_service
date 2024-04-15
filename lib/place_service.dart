@@ -1,3 +1,5 @@
+library place_service;
+
 export 'goong_service/goong_service.dart';
 export 'goong_service/places/goong_place_result.dart';
 export 'goong_service/places/goong_places_service.dart';
