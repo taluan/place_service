@@ -7,8 +7,7 @@ import 'package:place_service/goong_service/goong_service.dart';
 
 import '../../google_api_service/autocomplete/autocomplete_response.dart';
 import '../../google_api_service/models/lat_lon.dart';
-import '../../google_api_service/models/location_model.dart';
-import '../../google_api_service/utils/helper_utils.dart';
+import 'goong_place_result.dart';
 class GoongPlacesService {
 
   static const _placesApiUrl =
@@ -34,7 +33,8 @@ class GoongPlacesService {
       if (sessionToken != null) {
         queryParams.add("sessiontoken=$sessionToken");
       }
-      final url = Uri.encodeFull('$_placesApiUrl/AutoComplete?${queryParams.join("&")}&api_key=${GoongService.Goong_Api_Key}');
+      final Goong_Api_Key = GoongService.Goong_Api_Key;
+      final url = Uri.encodeFull('$_placesApiUrl/AutoComplete?${queryParams.join("&")}&api_key=$Goong_Api_Key');
       final response = await http.get(Uri.parse(url));
 
       // debugPrint("autoComplete url: $url");
@@ -50,33 +50,16 @@ class GoongPlacesService {
     return null;
   }
 
-  Future<LocationModel?> getPlaceDetail(String place_id, {String? sessiontoken}) async {
+  Future<GoongPlaceResult?> getPlaceDetail(String place_id, {String? sessiontoken}) async {
     try {
-      final url = Uri.encodeFull('$_placesApiUrl/Detail?place_id=$place_id&sessiontoken=$sessiontoken&api_key=${GoongService.Goong_Api_Key}');
+      final Goong_Api_Key = GoongService.Goong_Api_Key;
+      final url = Uri.encodeFull('$_placesApiUrl/Detail?place_id=$place_id&sessiontoken=$sessiontoken&api_key=$Goong_Api_Key');
       final response = await http.get(Uri.parse(url));
 
       // debugPrint("getPlaceDetail url: $url");
       if (response.statusCode == 200) {
-        Map<String, dynamic> result = json.decode(response.body)['result'];
-        Map<String, dynamic>? geometry = result['geometry'];
-        Map<String, dynamic>? location = geometry?['location'];
-        String address = (result['formatted_address'] ?? "").replaceAll(" 70000", "").trim();
-        if (location != null && address.isNotEmpty) {
-          List<String> arrAdd = address.split(", ");
-          String city = "";
-          String province = "";
-          if (arrAdd.length > 2) {
-            city = arrAdd[arrAdd.length-2];
-            province = arrAdd[arrAdd.length-1];
-          }
-
-          return LocationModel(
-              latitude: parseDouble(location['lat']),
-              longitude: parseDouble(location['lng']),
-              address: address,
-              city: city,
-              province: province, name: arrAdd[0]);
-        }
+        Map<String, dynamic>? result = json.decode(response.body)['result'];
+        return GoongPlaceResult.fromJson(result);
       } else {
         debugPrint("getPlaceDetail error: ${response.statusCode} (${response.reasonPhrase}), uri = ${response.request!.url}");
       }

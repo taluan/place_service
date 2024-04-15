@@ -27,11 +27,8 @@ class GeocodingResult {
 
   factory GeocodingResult.fromJson(Map<String, dynamic> json) {
     return GeocodingResult(
-      addressComponents: json['address_components'] != null
-          ? json['address_components']
-              .map<AddressComponent>((json) => AddressComponent.fromJson(json))
-              .toList()
-          : null,
+      addressComponents: json['address_components']?.map<AddressComponent>((json) => AddressComponent.fromJson(json))
+              .toList(),
       formattedAddress: json['formatted_address'],
       postcodeLocalities: json['postcode_localities'] != null
           ? (json['postcode_localities'] as List<dynamic>).cast<String>()

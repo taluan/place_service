@@ -5,9 +5,9 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
-import '../../google_api_service/models/location_model.dart';
 import '../../google_api_service/utils/helper_utils.dart';
 import '../goong_service.dart';
+import '../places/goong_place_result.dart';
 
 
 /// This service is used to calculate route between two points
@@ -19,10 +19,10 @@ class GoongGeocodingService {
   static final GoongGeocodingService instance = GoongGeocodingService._instance();
 
   /// `callback` argument will be called when route calculations finished.
-  Future<List<LocationModel>> reverseGeocoding(
+  Future<List<GoongPlaceResult>> reverseGeocoding(
     double lat,
     double lng) async {
-    List<LocationModel> list = [];
+    List<GoongPlaceResult> list = [];
     try {
       final url = '$_geocodingApiUrl?latlng=$lat,$lng&api_key=${GoongService.Goong_Api_Key}';
       final response = await http.get(Uri.parse(url));
@@ -32,31 +32,13 @@ class GoongGeocodingService {
        Map<String, dynamic> map = json.decode(response.body);
        List<dynamic> results = map['results'] ?? [];
        for (var result in results) {
-         Map<String, dynamic>? geometry = result['geometry'];
-         Map<String, dynamic>? location = geometry?['location'];
-         String address = (result['formatted_address'] ?? "").replaceAll(" 70000", "").trim();
-         if (location != null && address.isNotEmpty) {
-           List<String> arrAdd = address.split(", ");
-           String city = "";
-           String province = "";
-           if (arrAdd.length > 2) {
-             city = arrAdd[arrAdd.length-2];
-             province = arrAdd[arrAdd.length-1];
-           }
-
-           final locationModel = LocationModel(
-               latitude: parseDouble(location['lat']),
-               longitude: parseDouble(location['lng']),
-               address: address,
-               city: city,
-               province: province, name: arrAdd[0]);
-           debugPrint(locationModel.toString());
-           list.add(locationModel);
+         final location = GoongPlaceResult.fromJson(result);
+         if (location != null) {
+           list.add(location);
            if (list.length >= 4) {
              return list;
            }
          }
-
        }
       } else {
         debugPrint("reverseGeocoding error: ${response.statusCode} (${response.reasonPhrase}), uri = ${response.request!.url}");
@@ -68,7 +50,7 @@ class GoongGeocodingService {
     return list;
   }
 
-  Future<LocationModel?> forwardGeocoding(String address) async {
+  Future<GoongPlaceResult?> forwardGeocoding(String address) async {
     try {
       final url = Uri.encodeFull('$_geocodingApiUrl?address=$address&api_key=${GoongService.Goong_Api_Key}');
       final response = await http.get(Uri.parse(url));
@@ -78,25 +60,7 @@ class GoongGeocodingService {
         Map<String, dynamic> map = json.decode(response.body);
         List<dynamic> results = map['results'] ?? [];
         if (results.isNotEmpty) {
-          Map<String, dynamic>? geometry = results.first['geometry'];
-          Map<String, dynamic>? location = geometry?['location'];
-          String address = (results.first['formatted_address'] ?? "").replaceAll(" 70000", "").trim();
-          if (location != null && address.isNotEmpty) {
-            List<String> arrAdd = address.split(", ");
-            String city = "";
-            String province = "";
-            if (arrAdd.length > 2) {
-              city = arrAdd[arrAdd.length-2];
-              province = arrAdd[arrAdd.length-1];
-            }
-
-            return LocationModel(
-                latitude: parseDouble(location['lat']),
-                longitude: parseDouble(location['lng']),
-                address: address,
-                city: city,
-                province: province, name: arrAdd[0]);
-          }
+          return GoongPlaceResult.fromJson(results.firstOrNull);
         }
       } else {
         debugPrint("forwardGeocoding error: ${response.statusCode} (${response.reasonPhrase}), uri = ${response.request!.url}");
@@ -108,7 +72,7 @@ class GoongGeocodingService {
     return null;
   }
 
-  Future<LocationModel?> getPlaceDetail(String place_id) async {
+  Future<GoongPlaceResult?> getPlaceDetail(String place_id) async {
     try {
       final url = Uri.encodeFull('$_geocodingApiUrl?place_id=$place_id&api_key=${GoongService.Goong_Api_Key}');
       final response = await http.get(Uri.parse(url));
@@ -118,25 +82,7 @@ class GoongGeocodingService {
         Map<String, dynamic> map = json.decode(response.body);
         List<dynamic> results = map['results'] ?? [];
         if (results.isNotEmpty) {
-          Map<String, dynamic>? geometry = results.first['geometry'];
-          Map<String, dynamic>? location = geometry?['location'];
-          String address = (results.first['formatted_address'] ?? "").replaceAll(" 70000", "").trim();
-          if (location != null && address.isNotEmpty) {
-            List<String> arrAdd = address.split(", ");
-            String city = "";
-            String province = "";
-            if (arrAdd.length > 2) {
-              city = arrAdd[arrAdd.length-2];
-              province = arrAdd[arrAdd.length-1];
-            }
-
-            return LocationModel(
-                latitude: parseDouble(location['lat']),
-                longitude: parseDouble(location['lng']),
-                address: address,
-                city: city,
-                province: province, name: arrAdd[0]);
-          }
+          return GoongPlaceResult.fromJson(results.firstOrNull);
         }
       } else {
         debugPrint("getPlaceDetail error: ${response.statusCode} (${response.reasonPhrase}), uri = ${response.request!.url}");
