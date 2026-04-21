@@ -6,11 +6,14 @@ class AutocompletePrediction {
   /// [description] contains the human-readable name for the returned result. For establishment results, this is usually
   /// the business name.
   final String? description;
+  final String? deprecatedDescription;
 
   /// [distanceMeters] contains an integer indicating the straight-line distance between the predicted place,
   /// and the specified origin point, in meters. This field is only returned when the origin point is specified in the request.
   /// This field is not returned in predictions of type route.
   final int? distanceMeters;
+
+  final bool? hasChildren;
 
   /// [id] contains id.
   final String? id;
@@ -37,9 +40,27 @@ class AutocompletePrediction {
   /// [ "establishment", "geocode", "beauty_salon" ]. The array can contain multiple values.
   final List<String>? types;
 
+  String get addressDisplay {
+    final mainText = structuredFormatting?.mainText ?? "";
+    if (description != null && description!.isNotEmpty && description!.startsWith("$mainText,") && description!.split(",").length > 3) {
+      return description!.replaceAll("$mainText,", "").trim();
+    }
+    return description ?? "";
+  }
+
+  String get oldAddressDisplay {
+    final mainText = structuredFormatting?.mainText ?? "";
+    if (deprecatedDescription != null && deprecatedDescription!.isNotEmpty && deprecatedDescription!.startsWith("$mainText,") && deprecatedDescription!.split(",").length > 3) {
+      return deprecatedDescription!.replaceAll("$mainText,", "").trim();
+    }
+    return deprecatedDescription ?? "";
+  }
+
   AutocompletePrediction({
     this.description,
+    this.deprecatedDescription,
     this.distanceMeters,
+    this.hasChildren,
     this.id,
     this.matchedSubstrings,
     this.placeId,
@@ -52,21 +73,18 @@ class AutocompletePrediction {
   factory AutocompletePrediction.fromJson(Map<String, dynamic> json) {
     return AutocompletePrediction(
       description: json['description'] as String?,
+      deprecatedDescription: json['deprecated_description'] as String?,
       distanceMeters: json['distance_meters'] as int?,
+      hasChildren: json['has_children'] as bool?,
       id: json['id'] as String?,
-      matchedSubstrings: json['matched_substrings'] != null
-          ? json['matched_substrings']
-              .map<MatchedSubstring>((json) => MatchedSubstring.fromJson(json))
-              .toList()
-          : null,
+      matchedSubstrings: json['matched_substrings']?.map<MatchedSubstring>((json) => MatchedSubstring.fromJson(json))
+              .toList(),
       placeId: json['place_id'] as String?,
       reference: json['reference'] as String?,
       structuredFormatting: json['structured_formatting'] != null
           ? StructuredFormatting.fromJson(json['structured_formatting'])
           : null,
-      terms: json['terms'] != null
-          ? json['terms'].map<Term>((json) => Term.fromJson(json)).toList()
-          : null,
+      terms: json['terms']?.map<Term>((json) => Term.fromJson(json)).toList(),
       types: json['types'] != null
           ? (json['types'] as List<dynamic>).cast<String>()
           : null,

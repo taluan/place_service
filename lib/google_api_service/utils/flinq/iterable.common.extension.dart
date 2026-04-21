@@ -11,7 +11,7 @@ extension IterableCommonExtension<T> on Iterable<T> {
   /// If `this` is empty, the result of invoking is [null].
   /// Otherwise returns the first element in the iteration order,
   /// equivalent to `this.elementAt(0)`.
-  T? get firstOrNull => this.firstWhereOrNull((_) => true);
+  T? get firstOrNull => firstWhereOrNull((_) => true);
 
   /// Returns the last element.
   ///
@@ -21,19 +21,19 @@ extension IterableCommonExtension<T> on Iterable<T> {
   /// Some iterables may have more efficient ways to find the last element
   /// (for example a list can directly access the last element,
   /// without iterating through the previous ones).
-  T? get lastOrNull => this.lastWhereOrNull((_) => true);
+  T? get lastOrNull => lastWhereOrNull((_) => true);
 
   /// Checks that this iterable has only one element, and returns that element.
   ///
   /// Returns [null] if there are either no elements or more than one element.
-  T? get singleOrNull => this.singleWhereOrNull((_) => true);
+  T? get singleOrNull => singleWhereOrNull((_) => true);
 
   /// Returns the first element that satisfies the given predicate [test].
   ///
   /// Iterates through elements and returns the first to satisfy [test].
   ///
   /// If no element satisfies [test], the result of invoking is [null].
-  T? firstOrNullWhere(bool test(T element)) => this.firstWhereOrNull(test);
+  T? firstOrNullWhere(bool Function(T element) test) => firstWhereOrNull(test);
 
   /// Returns the last element that satisfies the given predicate [test].
   ///
@@ -45,13 +45,13 @@ extension IterableCommonExtension<T> on Iterable<T> {
   /// and finally returns that last one that matched.
   ///
   /// If no element satisfies [test], the result of invoking is [null].
-  T? lastOrNullWhere(bool test(T element)) => this.lastWhereOrNull(test);
+  T? lastOrNullWhere(bool Function(T element) test) => lastWhereOrNull(test);
 
   /// Returns the single element that satisfies [test].
   ///
   /// Returns [null] if there are either no elements or more than one element
   /// satisfying [test].
-  T? singleOrNullWhere(bool test(T element)) => this.singleWhereOrNull(test);
+  T? singleOrNullWhere(bool Function(T element) test) => singleWhereOrNull(test);
 
   /// Maps [Iterable] and casts it to a [List].
   ///
@@ -67,7 +67,7 @@ extension IterableCommonExtension<T> on Iterable<T> {
   /// Methods on the returned iterable are allowed to omit calling `f`
   /// on any element where the result isn't needed.
   /// For example, [elementAt] may call `f` only once.
-  List<E> mapList<E>(E f(T e)) => this.map(f).toList();
+  List<E> mapList<E>(E Function(T e) f) => map(f).toList();
 
   /// Filters [Iterable] and casts it to a [List].
   ///
@@ -88,15 +88,15 @@ extension IterableCommonExtension<T> on Iterable<T> {
   ///
   /// For more info about filtering refer to [Iterable.where].
   /// For more info about mapping refer to [Iterable.map].
-  List<E> whereMapList<E>(bool test(T element), E f(T e)) =>
-      this.where(test).mapList(f);
+  List<E> whereMapList<E>(bool Function(T element) test, E Function(T e) f) =>
+      where(test).mapList(f);
 
   /// Maps [Iterable], then filters [Iterable] and then casts it to a [List].
   ///
   /// For more info about mapping refer to [Iterable.map].
   /// For more info about filtering refer to [Iterable.where].
-  List<E> mapWhereList<E>(E f(T e), bool test(E element)) =>
-      this.map(f).whereList(test);
+  List<E> mapWhereList<E>(E Function(T e) f, bool Function(E element) test) =>
+      map(f).whereList(test);
 
   /// Returns `this` iterable without any `null` values within this [Iterable].
   ///
@@ -104,15 +104,15 @@ extension IterableCommonExtension<T> on Iterable<T> {
   /// Predicate of [Iterable.where] is `(item) => item != null`.
   ///
   /// For more info about filtering refer to [Iterable.where].
-  Iterable<T> get notNull => this.where((_) => _ != null).toList();
+  Iterable<T> get notNull => where((e) => e != null).toList();
 
   /// Groups [Iterable] via `K by(T item)`
   ///
   /// if [this] is empty, the result of invoking is [<K, List<T>>{}]
-  Map<K, List<T>> group<K>(K by(T item)) {
+  Map<K, List<T>> group<K>(K Function(T item) by) {
     final map = <K, List<T>>{};
 
-    this.forEach((value) {
+    for (var value in this) {
       final key = by(value);
 
       if (map.containsKey(key)) {
@@ -120,7 +120,7 @@ extension IterableCommonExtension<T> on Iterable<T> {
       } else {
         map[key] = <T>[value];
       }
-    });
+    }
 
     return map;
   }
@@ -128,6 +128,6 @@ extension IterableCommonExtension<T> on Iterable<T> {
   /// Groups [Iterable] via `K by(T item)` and maps it using `V as(List<T> item)` conversion.
   ///
   /// For more info about mapping refer to [Iterable.map].
-  Map<K, V> groupMap<K, V>(K by(T item), V as(List<T> item)) =>
+  Map<K, V> groupMap<K, V>(K Function(T item) by, V Function(List<T> item) as) =>
       group(by).map((k, v) => MapEntry(k, as(v)));
 }

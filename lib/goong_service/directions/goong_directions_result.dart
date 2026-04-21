@@ -15,12 +15,12 @@ class GoongDirectionsResult {
   factory GoongDirectionsResult.fromMap(Map<String, dynamic> map) =>
       GoongDirectionsResult(
         routes: (map['routes'] as List?)
-            ?.mapList((_) => GoongDirectionsRoute.fromMap(_)),
+            ?.mapList((json) => GoongDirectionsRoute.fromMap(json)),
         geocodedWaypoints:
-        (map[''] as List?)?.mapList((_) => GeocodedWaypoint.fromMap(_)),
+        (map[''] as List?)?.mapList((json) => GeocodedWaypoint.fromMap(json)),
         errorMessage: map['error_message'] as String?,
         availableTravelModes: (map['available_travel_modes'] as List?)
-            ?.mapList((_) => TravelMode(_)),
+            ?.mapList((json) => TravelMode(json)),
       );
 
   /// When the Directions API returns results, it places them within a
@@ -77,14 +77,14 @@ class GoongDirectionsRoute {
   factory GoongDirectionsRoute.fromMap(Map<String, dynamic> map) => GoongDirectionsRoute(
     bounds: null,
     copyrights: map['copyrights'] as String?,
-    legs: (map['legs'] as List?)?.mapList((_) => Leg.fromMap(_)),
+    legs: (map['legs'] as List?)?.mapList((json) => Leg.fromMap(json)),
     overviewPolyline: map['overview_polyline'] != null
         ? OverviewPolyline.fromMap(map['overview_polyline'])
         : null,
     summary: map['summary'] as String?,
-    warnings: (map['warnings'] as List?)?.mapList((_) => _ as String?),
+    warnings: (map['warnings'] as List?)?.mapList((json) => json as String?),
     waypointOrder: (map['waypoint_order'] as List?)
-        ?.mapList((_) => num.tryParse(_.toString())),
+        ?.mapList((e) => num.tryParse(e.toString())),
     fare: map['fare'] != null ? Fare.fromMap(map['fare']) : null,
   );
 

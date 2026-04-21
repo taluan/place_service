@@ -2,6 +2,7 @@ class GoongPlaceResult {
   double? latitude;
   double? longitude;
   String? address;
+  String? deprecatedAddress;
   String? city;
   String? province;
   String? name;
@@ -10,6 +11,7 @@ class GoongPlaceResult {
       {this.latitude,
       this.longitude,
       this.address,
+      this.deprecatedAddress,
       this.city,
       this.province,
       this.name});
@@ -32,6 +34,7 @@ class GoongPlaceResult {
             latitude: location['lat']?.toDouble(),
             longitude: location['lng']?.toDouble(),
             address: address,
+            deprecatedAddress: json['deprecated_description'],
             city: city,
             province: province, name: arrAdd[0]);
       }

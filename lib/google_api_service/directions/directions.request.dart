@@ -17,7 +17,7 @@ String _convertLocation(dynamic location) {
     location = location.replaceAll(', ', ',');
     return location
         .split(' ')
-        .where((dynamic _) => _.trim().isNotEmpty == true)
+        .where((dynamic e) => e.trim().isNotEmpty == true)
         .join('+');
   }
 
@@ -215,7 +215,7 @@ class DirectionsRequest {
     if (waypoints?.isEmpty != false) return null;
 
     return (optimizeWaypoints == true ? 'optimize:true|' : '') +
-        waypoints!.map((_) => _.toString()).join('|');
+        waypoints!.map((json) => json.toString()).join('|');
   }
 
   @override
@@ -431,7 +431,7 @@ class TransitOptions {
   String toString() =>
       '${_addIfNotNull('arrival_time', arrivalTime!.millisecondsSinceEpoch)}'
       '${_addIfNotNull('departure_time', departureTime!.millisecondsSinceEpoch)}'
-      '${_addIfNotNull('transit_mode', modes!.map((_) => _.toString()).join('|'))}'
+      '${_addIfNotNull('transit_mode', modes!.map((e) => e.toString()).join('|'))}'
       '${_addIfNotNull('transit_routing_preference', routingPreference)}';
 }
 

@@ -9,8 +9,8 @@ import 'goong_directions_result.dart';
 
 /// This service is used to calculate route between two points
 class GoongDirectionsService {
-  static const _directionApiUrl =
-      'https://rsapi.goong.io/Direction';
+  // static const _directionApiUrl = 'https://rsapi.goong.io/Direction';
+  static const _directionApiUrl = 'https://rsapi.goong.io/v2/direction';
 
   GoongDirectionsService._instance();
   static final GoongDirectionsService instance = GoongDirectionsService._instance();
@@ -48,7 +48,7 @@ class GoongDirectionsService {
     location = location.replaceAll(', ', ',');
     return location
         .split(' ')
-        .where((dynamic _) => _.trim().isNotEmpty == true)
+        .where((dynamic e) => e.trim().isNotEmpty == true)
         .join('+');
   }
 }

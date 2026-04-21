@@ -43,13 +43,13 @@ class DirectionsResult {
   factory DirectionsResult.fromMap(Map<String, dynamic> map) =>
       DirectionsResult(
         routes: (map['routes'] as List?)
-            ?.mapList((_) => DirectionsRoute.fromMap(_)),
+            ?.mapList((json) => DirectionsRoute.fromMap(json)),
         geocodedWaypoints:
-            (map[''] as List?)?.mapList((_) => GeocodedWaypoint.fromMap(_)),
+            (map[''] as List?)?.mapList((json) => GeocodedWaypoint.fromMap(json)),
         status: map['status'] != null ? DirectionsStatus(map['status']) : null,
         errorMessage: map['error_message'] as String?,
         availableTravelModes: (map['available_travel_modes'] as List?)
-            ?.mapList((_) => TravelMode(_)),
+            ?.mapList((json) => TravelMode(json)),
       );
 
   /// When the Directions API returns results, it places them within a
@@ -203,14 +203,14 @@ class DirectionsRoute {
           southwest: _getGeoCoordFromMap(map['bounds']['southwest'])!,
         ),
         copyrights: map['copyrights'] as String?,
-        legs: (map['legs'] as List?)?.mapList((_) => Leg.fromMap(_)),
+        legs: (map['legs'] as List?)?.mapList((json) => Leg.fromMap(json)),
         overviewPolyline: map['overview_polyline'] != null
             ? OverviewPolyline.fromMap(map['overview_polyline'])
             : null,
         summary: map['summary'] as String?,
-        warnings: (map['warnings'] as List?)?.mapList((_) => _ as String?),
+        warnings: (map['warnings'] as List?)?.mapList((json) => json as String?),
         waypointOrder: (map['waypoint_order'] as List?)
-            ?.mapList((_) => num.tryParse(_.toString())),
+            ?.mapList((e) => num.tryParse(e.toString())),
         fare: map['fare'] != null ? Fare.fromMap(map['fare']) : null,
       );
 
@@ -233,7 +233,7 @@ class DirectionsRoute {
       overviewPolyline?.points?.isNotEmpty == true
           ? gpl
               .decodePolyline(overviewPolyline!.points!)
-              .mapList((_) => GeoCoord.fromList(_))
+              .mapList((e) => GeoCoord.fromList(e))
           : null;
 
   /// Contains a single points object that holds an
@@ -391,7 +391,7 @@ class GeocodedWaypoint {
         geocoderStatus: map['geocoder_status'] as String?,
         partialMatch: map['partial_match'] == 'true',
         placeId: map['place_id'] as String?,
-        types: (map['types'] as List?)?.mapList((_) => _ as String?),
+        types: (map['types'] as List?)?.mapList((json) => json as String?),
       );
 
   /// Indicates the status code resulting from the geocoding
@@ -626,7 +626,7 @@ class Leg {
         endLocation: _getGeoCoordFromMap(map['end_location']),
         startAddress: map['start_address'] as String?,
         startLocation: _getGeoCoordFromMap(map['start_location']),
-        steps: (map['steps'] as List?)?.mapList((_) => Step.fromMap(_)),
+        steps: (map['steps'] as List?)?.mapList((json) => Step.fromMap(json)),
       );
 
   /// Contains the estimated time of arrival for this leg. This property
@@ -805,8 +805,8 @@ class Step {
         endLocation: _getGeoCoordFromMap(map['end_location']),
         startLocation: _getGeoCoordFromMap(map['start_location']),
         instructions: map['html_instructions'] as String?,
-        path: (map['path'] as List?)?.mapList((_) => _getGeoCoordFromMap(_)),
-        steps: (map['steps'] as List?)?.mapList((_) => Step.fromMap(_)),
+        path: (map['path'] as List?)?.mapList((json) => _getGeoCoordFromMap(json)),
+        steps: (map['steps'] as List?)?.mapList((json) => Step.fromMap(json)),
         transit: map['transit'] != null
             ? TransitDetails.fromMap(map['transit'])
             : null,
@@ -1101,7 +1101,7 @@ class TransitLine {
         shortName: map['short_name'] as String?,
         color: map['color'] as String?,
         agencies: (map['agencies'] as List?)
-            ?.mapList((_) => TransitAgency.fromMap(_)),
+            ?.mapList((json) => TransitAgency.fromMap(json)),
         url: map['url'] as String?,
         icon: map['icon'] as String?,
         textColor: map['text_color'] as String?,

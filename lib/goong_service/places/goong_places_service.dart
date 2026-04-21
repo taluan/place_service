@@ -10,11 +10,12 @@ import '../../google_api_service/models/lat_lon.dart';
 import 'goong_place_result.dart';
 class GoongPlacesService {
 
-  static const _placesApiUrl =
-      'https://rsapi.goong.io/Place';
+  // static const _placesApiUrl = 'https://rsapi.goong.io/place';
+  static const _placesApiUrl = 'https://rsapi.goong.io/v2/place';
 
   GoongPlacesService._instance();
   static final GoongPlacesService instance = GoongPlacesService._instance();
+  final hasDeprecatedAdministrativeUnit = true;
 
   Future<AutocompleteResponse?> autoComplete(
       String input, {
@@ -34,10 +35,10 @@ class GoongPlacesService {
         queryParams.add("sessiontoken=$sessionToken");
       }
       final Goong_Api_Key = GoongService.Goong_Api_Key;
-      final url = Uri.encodeFull('$_placesApiUrl/AutoComplete?${queryParams.join("&")}&api_key=$Goong_Api_Key');
+      final url = Uri.encodeFull('$_placesApiUrl/autocomplete?${queryParams.join("&")}&has_deprecated_administrative_unit=$hasDeprecatedAdministrativeUnit&api_key=$Goong_Api_Key');
       final response = await http.get(Uri.parse(url));
 
-      // debugPrint("autoComplete url: $url");
+      debugPrint("autoComplete url: $url\n ${response.body}");
       if (response.statusCode == 200) {
         return AutocompleteResponse.fromJson(json.decode(response.body));
       } else {
@@ -50,13 +51,33 @@ class GoongPlacesService {
     return null;
   }
 
+  Future<AutocompleteResponse?> placeChildren(String parentId) async {
+    try {
+      final Goong_Api_Key = GoongService.Goong_Api_Key;
+      final url = Uri.encodeFull('$_placesApiUrl/children?parent_id=$parentId&has_deprecated_administrative_unit=$hasDeprecatedAdministrativeUnit&api_key=$Goong_Api_Key');
+      final response = await http.get(Uri.parse(url));
+
+      debugPrint("place children url: $url\n ${response.body}");
+      if (response.statusCode == 200) {
+        return AutocompleteResponse.fromJson(json.decode(response.body));
+      } else {
+        debugPrint("place children error: ${response.statusCode} (${response.reasonPhrase}), uri = ${response.request!.url}");
+      }
+
+    } catch(e) {
+      debugPrint("place children error: ${e.toString()}");
+    }
+    return null;
+  }
+
+
   Future<GoongPlaceResult?> getPlaceDetail(String place_id, {String? sessiontoken}) async {
     try {
       final Goong_Api_Key = GoongService.Goong_Api_Key;
-      final url = Uri.encodeFull('$_placesApiUrl/Detail?place_id=$place_id&sessiontoken=$sessiontoken&api_key=$Goong_Api_Key');
+      final url = Uri.encodeFull('$_placesApiUrl/detail?place_id=$place_id&sessiontoken=$sessiontoken&has_deprecated_administrative_unit=$hasDeprecatedAdministrativeUnit&api_key=$Goong_Api_Key');
       final response = await http.get(Uri.parse(url));
 
-      // debugPrint("getPlaceDetail url: $url");
+      debugPrint("getPlaceDetail url: $url \n ${response.body}");
       if (response.statusCode == 200) {
         Map<String, dynamic>? result = json.decode(response.body)['result'];
         return GoongPlaceResult.fromJson(result);

@@ -11,8 +11,9 @@ import '../places/goong_place_result.dart';
 
 /// This service is used to calculate route between two points
 class GoongGeocodingService {
-  static const _geocodingApiUrl =
-      'https://rsapi.goong.io/geocode';
+  // static const _geocodingApiUrl = 'https://rsapi.goong.io/geocode';
+  static const _geocodingApiUrl = 'https://rsapi.goong.io/v2/geocode';
+  final hasDeprecatedAdministrativeUnit = true;
 
   GoongGeocodingService._instance();
   static final GoongGeocodingService instance = GoongGeocodingService._instance();
@@ -20,13 +21,13 @@ class GoongGeocodingService {
   /// `callback` argument will be called when route calculations finished.
   Future<List<GoongPlaceResult>> reverseGeocoding(
     double lat,
-    double lng) async {
+    double lng, {int limit = 5}) async {
     List<GoongPlaceResult> list = [];
     try {
-      final url = '$_geocodingApiUrl?latlng=$lat,$lng&api_key=${GoongService.Goong_Api_Key}';
+      final url = '$_geocodingApiUrl?latlng=$lat,$lng&limit=$limit&api_key=${GoongService.Goong_Api_Key}&has_deprecated_administrative_unit=$hasDeprecatedAdministrativeUnit';
       final response = await http.get(Uri.parse(url));
 
-      // debugPrint("goong direction url: $url");
+      debugPrint("goong direction url: $url");
       if (response.statusCode == 200) {
        Map<String, dynamic> map = json.decode(response.body);
        List<dynamic> results = map['results'] ?? [];
@@ -34,7 +35,7 @@ class GoongGeocodingService {
          final location = GoongPlaceResult.fromJson(result);
          if (location != null) {
            list.add(location);
-           if (list.length >= 4) {
+           if (list.length >= limit) {
              return list;
            }
          }
@@ -51,7 +52,7 @@ class GoongGeocodingService {
 
   Future<GoongPlaceResult?> forwardGeocoding(String address) async {
     try {
-      final url = Uri.encodeFull('$_geocodingApiUrl?address=$address&api_key=${GoongService.Goong_Api_Key}');
+      final url = Uri.encodeFull('$_geocodingApiUrl?address=$address&api_key=${GoongService.Goong_Api_Key}&has_deprecated_administrative_unit=$hasDeprecatedAdministrativeUnit');
       final response = await http.get(Uri.parse(url));
 
       debugPrint("forwardGeocoding url: $url");
@@ -73,7 +74,7 @@ class GoongGeocodingService {
 
   Future<GoongPlaceResult?> getPlaceDetail(String place_id) async {
     try {
-      final url = Uri.encodeFull('$_geocodingApiUrl?place_id=$place_id&api_key=${GoongService.Goong_Api_Key}');
+      final url = Uri.encodeFull('$_geocodingApiUrl?place_id=$place_id&api_key=${GoongService.Goong_Api_Key}&has_deprecated_administrative_unit=$hasDeprecatedAdministrativeUnit');
       final response = await http.get(Uri.parse(url));
 
       debugPrint("getPlaceDetail url: $url");

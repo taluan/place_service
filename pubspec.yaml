@@ -4,10 +4,10 @@ version: 0.0.1
 homepage: https://github.com/taluan/place_service.git
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ^3.9.2
 
 dependencies:
-  http: ^1.1.0
+  http: ^1.2.1
 
 dev_dependencies:
   flutter_test:
