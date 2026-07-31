@@ -42,4 +42,16 @@ class GoongPlaceResult {
     return null;
   }
 
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['latitude'] = this.latitude;
+    data['longitude'] = this.longitude;
+    data['address'] = this.address;
+    data['deprecatedAddress'] = this.deprecatedAddress;
+    data['city'] = this.city;
+    data['province'] = this.province;
+    data['name'] = this.name;
+    return data;
+  }
+
 }

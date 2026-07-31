@@ -27,7 +27,7 @@ class GoongGeocodingService {
       final url = '$_geocodingApiUrl?latlng=$lat,$lng&limit=$limit&api_key=${GoongService.Goong_Api_Key}&has_deprecated_administrative_unit=$hasDeprecatedAdministrativeUnit';
       final response = await http.get(Uri.parse(url));
 
-      debugPrint("goong direction url: $url");
+      debugPrint("goong reverseGeocoding url: $url");
       if (response.statusCode == 200) {
        Map<String, dynamic> map = json.decode(response.body);
        List<dynamic> results = map['results'] ?? [];

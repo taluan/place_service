@@ -15,7 +15,7 @@ class GoongPlacesService {
 
   GoongPlacesService._instance();
   static final GoongPlacesService instance = GoongPlacesService._instance();
-  final hasDeprecatedAdministrativeUnit = true;
+  final hasDeprecatedAdministrativeUnit = false;
 
   Future<AutocompleteResponse?> autoComplete(
       String input, {
@@ -34,11 +34,13 @@ class GoongPlacesService {
       if (sessionToken != null) {
         queryParams.add("sessiontoken=$sessionToken");
       }
+      // debugPrint("autoComplete begin: ${DateTime.now()}");
       final Goong_Api_Key = GoongService.Goong_Api_Key;
       final url = Uri.encodeFull('$_placesApiUrl/autocomplete?${queryParams.join("&")}&has_deprecated_administrative_unit=$hasDeprecatedAdministrativeUnit&api_key=$Goong_Api_Key');
       final response = await http.get(Uri.parse(url));
 
-      debugPrint("autoComplete url: $url\n ${response.body}");
+      // debugPrint("autoComplete end: ${DateTime.now()}");
+      // debugPrint("autoComplete url: $url\n ${response.body}");
       if (response.statusCode == 200) {
         return AutocompleteResponse.fromJson(json.decode(response.body));
       } else {
@@ -57,7 +59,7 @@ class GoongPlacesService {
       final url = Uri.encodeFull('$_placesApiUrl/children?parent_id=$parentId&has_deprecated_administrative_unit=$hasDeprecatedAdministrativeUnit&api_key=$Goong_Api_Key');
       final response = await http.get(Uri.parse(url));
 
-      debugPrint("place children url: $url\n ${response.body}");
+      // debugPrint("place children url: $url\n ${response.body}");
       if (response.statusCode == 200) {
         return AutocompleteResponse.fromJson(json.decode(response.body));
       } else {
@@ -77,7 +79,7 @@ class GoongPlacesService {
       final url = Uri.encodeFull('$_placesApiUrl/detail?place_id=$place_id&sessiontoken=$sessiontoken&has_deprecated_administrative_unit=$hasDeprecatedAdministrativeUnit&api_key=$Goong_Api_Key');
       final response = await http.get(Uri.parse(url));
 
-      debugPrint("getPlaceDetail url: $url \n ${response.body}");
+      // debugPrint("getPlaceDetail url: $url \n ${response.body}");
       if (response.statusCode == 200) {
         Map<String, dynamic>? result = json.decode(response.body)['result'];
         return GoongPlaceResult.fromJson(result);
