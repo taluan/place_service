@@ -31,7 +31,7 @@ class GoongDirectionsService {
       final url = '$_directionApiUrl?origin=${_convertLocation(origin)}&destination=${_convertLocation(destination)}&vehicle=${vehicle ?? 'bike'}&api_key=${GoongService.Goong_Api_Key}';
       final response = await http.get(Uri.parse(url));
 
-      // debugPrint("goong direction url: $url");
+      // print("goong direction url: $url");
       if (response.statusCode != 200) {
         // debugPrint('request goong direction error: ${'${response.statusCode} (${response.reasonPhrase}), uri = ${response.request!.url}'}');
         callback(null);

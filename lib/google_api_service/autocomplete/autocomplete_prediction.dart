@@ -2,11 +2,29 @@ import '../models/matched_substring.dart';
 import '../models/structured_formatting.dart';
 import '../models/term.dart';
 
+class Compound {
+  final String? commune;
+
+  final String? province;
+
+  Compound({this.commune, this.province});
+
+  factory Compound.fromJson(Map<String, dynamic> json) {
+    return Compound(
+      commune: json['commune'] as String?,
+      province: json['province'] as String?,
+    );
+  }
+}
+
+
 class AutocompletePrediction {
   /// [description] contains the human-readable name for the returned result. For establishment results, this is usually
   /// the business name.
   final String? description;
   final String? deprecatedDescription;
+
+  final Compound? compound;
 
   /// [distanceMeters] contains an integer indicating the straight-line distance between the predicted place,
   /// and the specified origin point, in meters. This field is only returned when the origin point is specified in the request.
@@ -40,10 +58,19 @@ class AutocompletePrediction {
   /// [ "establishment", "geocode", "beauty_salon" ]. The array can contain multiple values.
   final List<String>? types;
 
+  String? get descriptionCustom {
+    if (compound != null && compound!.commune != null && compound!.province != null && structuredFormatting?.mainText != null && description != null && description!.allMatches(",").length < 2) {
+      return "${structuredFormatting!.mainText}, ${compound!.commune}, ${compound!.province}";
+    }
+
+    return description;
+  }
+
   String get addressDisplay {
     final mainText = structuredFormatting?.mainText ?? "";
-    if (description != null && description!.isNotEmpty && description!.startsWith("$mainText,") && description!.split(",").length > 3) {
-      return description!.replaceAll("$mainText,", "").trim();
+    final description = descriptionCustom;
+    if (description != null && description.isNotEmpty && description.startsWith("$mainText,") && description.split(",").length > 3) {
+      return description.replaceAll("$mainText,", "").trim();
     }
     return description ?? "";
   }
@@ -59,6 +86,7 @@ class AutocompletePrediction {
   AutocompletePrediction({
     this.description,
     this.deprecatedDescription,
+    this.compound,
     this.distanceMeters,
     this.hasChildren,
     this.id,
@@ -72,8 +100,11 @@ class AutocompletePrediction {
 
   factory AutocompletePrediction.fromJson(Map<String, dynamic> json) {
     return AutocompletePrediction(
-      description: json['description'] as String?,
+      description: (json['description'] as String?)?.replaceAll(", Việt Nam", ""),
       deprecatedDescription: json['deprecated_description'] as String?,
+      compound: json['compound'] != null
+          ? Compound.fromJson(json['compound'])
+          : null,
       distanceMeters: json['distance_meters'] as int?,
       hasChildren: json['has_children'] as bool?,
       id: json['id'] as String?,
